@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Author;
 use App\Models\Book;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class BookController extends Controller
 {
@@ -12,12 +13,19 @@ class BookController extends Controller
         return Book::with('authors')->paginate(10);
     }
 
+    public function view() {
+        return Inertia::render('Books/index', ['books' => $this->index(), 'authors' => Author::all(['id', 'name'])]);
+    }
+
+    public function view_book(int $id) {
+    return Inertia::render('Books/view', ['id' => $id]);
+    }
+
     public function get_one(int $id) {
-        $book = Book::where('id', $id)->first();
+        $book = Book::with('authors')->where('id', $id)->first();
 
         if($book) {
-            $authors = $book->authors();
-            return response()->json($authors);
+            return response()->json($book);
         }
 
         return response('Book not found', 404);
@@ -43,11 +51,14 @@ class BookController extends Controller
         $book->authors()->saveMany($authors);
         $book->save();
 
-        return response('Book Created', 201);
+        $book = Book::with('author')->where('id', $book->id)->first();
+
+        return response()->json($book);
     }
 
-    public function update() {
-
+    public function update(Request $request) {
+        $book = Book::where('id', $request->id);
+        return response()->json($book);
     }
 
     public function delete(int $id) {

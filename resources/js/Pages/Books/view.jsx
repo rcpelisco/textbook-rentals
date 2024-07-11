@@ -1,23 +1,19 @@
-import BookItem from "@/Components/Books/BookItem";
-import { Link, Head } from "@inertiajs/react";
+import { Head, Link, usePage } from "@inertiajs/react";
 import axios from "axios";
 import { useState } from "react";
 
-export default function Welcome({ auth, laravelVersion, phpVersion }) {
-    const [books, setBooks] = useState([]);
+export default function ViewBook({ auth }) {
+    const {
+        props: { id },
+    } = usePage();
+    const page = usePage();
+    const [book, setBook] = useState();
 
-    const handleSearchOnChange = async (e) => {
-        if (e.target.value === "") {
-            setBooks([]);
-            return;
-        }
-
-        const { data } = await axios.get("/search", {
-            params: { query: e.target.value },
+    useEffect(() => {
+        axios.get(`/books/${id}`).then((res) => {
+            setBook(res.data);
         });
-
-        setBooks(data);
-    };
+    }, []);
 
     return (
         <>
@@ -73,21 +69,15 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
 
                         <main className="mt-6">
                             <div className="grid gap-6 lg:grid-cols-2 lg:gap-8">
-                                <input
-                                    type="text"
-                                    className="rounded-md text-black"
-                                    placeholder="Enter An ISBN, Title, or Author..."
-                                    onChange={handleSearchOnChange}
-                                />
-                                {books.map((book, index) => (
-                                    <div className="flex flex-col items-start gap-6 overflow-hidden rounded-lg bg-white p-6 shadow-[0px_14px_34px_0px_rgba(0,0,0,0.08)] ring-1 ring-white/[0.05] transition duration-300 hover:text-black/70 hover:ring-black/20 focus:outline-none focus-visible:ring-[#FF2D20] md:row-span-3 lg:p-10 lg:pb-10 dark:bg-zinc-900 dark:ring-zinc-800 dark:hover:text-white/70 dark:hover:ring-zinc-700 dark:focus-visible:ring-[#FF2D20]">
+                                <div className="flex flex-col items-start gap-6 overflow-hidden rounded-lg bg-white p-6 shadow-[0px_14px_34px_0px_rgba(0,0,0,0.08)] ring-1 ring-white/[0.05] transition duration-300 hover:text-black/70 hover:ring-black/20 focus:outline-none focus-visible:ring-[#FF2D20] md:row-span-3 lg:p-10 lg:pb-10 dark:bg-zinc-900 dark:ring-zinc-800 dark:hover:text-white/70 dark:hover:ring-zinc-700 dark:focus-visible:ring-[#FF2D20]">
+                                    {book && (
                                         <div
                                             key={book.id}
                                             className="p-4 rounded bg-black/5 w-[600px]"
                                         >
-                                            <h4 className="text-xl font-bold text-center text-white">
+                                            <h1 className="mb-5 text-4xl font-bold text-center text-white">
                                                 {book.title}
-                                            </h4>
+                                            </h1>
                                             <div className="flex flex-col">
                                                 <div className="flex gap-2">
                                                     <span className="text-end flex-1 text-gray-500">
@@ -96,7 +86,11 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                                     <span className="text-start flex-1 text-nowrap">
                                                         {book.authors.map(
                                                             (author) => (
-                                                                <p>
+                                                                <p
+                                                                    key={
+                                                                        author.id
+                                                                    }
+                                                                >
                                                                     {
                                                                         author.name
                                                                     }
@@ -130,22 +124,11 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                                     </span>
                                                 </div>
                                             </div>
-                                            <div className="flex items-center justify-center mt-6">
-                                                <Link href={`books/${book.id}`}>
-                                                    <button className="bg-gray-400 text-black py-1 px-2 rounded-md">
-                                                        Compare Prices
-                                                    </button>
-                                                </Link>
-                                            </div>
                                         </div>
-                                    </div>
-                                ))}
+                                    )}
+                                </div>
                             </div>
                         </main>
-
-                        <footer className="py-16 text-center text-sm text-black dark:text-white/70">
-                            Laravel v{laravelVersion} (PHP v{phpVersion})
-                        </footer>
                     </div>
                 </div>
             </div>

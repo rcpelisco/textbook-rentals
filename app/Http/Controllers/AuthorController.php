@@ -13,6 +13,10 @@ class AuthorController extends Controller
         return Author::paginate(10);
     }
 
+    public function view() {
+        return Inertia::render('Authors', ['authors' => $this->index()]);
+    }
+
     public function get_one() {
 
     }
