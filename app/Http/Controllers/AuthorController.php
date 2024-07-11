@@ -13,6 +13,10 @@ class AuthorController extends Controller
         return Author::paginate(10);
     }
 
+    public function get_one() {
+
+    }
+
     public function create(Request $request) {
         $data = $request->validate([
             'name' => 'required|min:3',
@@ -25,4 +29,8 @@ class AuthorController extends Controller
 
         return back()->with('message', 'Author Created');
     }
+
+    public function update() {}
+
+    public function delete() {}
 }
